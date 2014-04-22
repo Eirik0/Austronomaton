@@ -55,6 +55,7 @@ public class SpacePanel extends JPanel {
 
 			system.passTime(dt);
 			
+			mouseController.updateScreenMomentum();
 			graphics.drawImage(system.getImage(getWidth(), getHeight(), mouseController.getOffsetX(), mouseController.getOffsetY()),0,0,null);
 			
 			lastTime = currentTime;
