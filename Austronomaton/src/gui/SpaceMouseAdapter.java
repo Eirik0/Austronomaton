@@ -14,10 +14,16 @@ public class SpaceMouseAdapter extends MouseAdapter {
 	private int offsetY = 0;
 	private int offsetX = 0;
 
+	private double dx = 0;
+	private double dy = 0;
+
+	private static final double FRICTION = 0.95;
+
 	public int getOffsetX() {
 		if (isDragging) {
 			return offsetX + dragStartX - dragEndX;
 		}
+		
 		return offsetX;
 	}
 
@@ -33,6 +39,16 @@ public class SpaceMouseAdapter extends MouseAdapter {
 		return offsetY;
 	}
 
+	public void updateScreenMomentum() {
+		if(!isDragging) {
+			offsetX += MathUtils.makeInt(dx);
+			offsetY += MathUtils.makeInt(dy);
+
+			dx *= FRICTION;
+			dy *= FRICTION;
+		}
+	}
+
 	@Override
 	public void mousePressed(MouseEvent e) {
 		dragStartX = e.getX();
@@ -45,6 +61,9 @@ public class SpaceMouseAdapter extends MouseAdapter {
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		isDragging = true;
+
+		dx = dragEndX - e.getX();
+		dy = dragEndY - e.getY();
 
 		dragEndX = e.getX();
 		dragEndY = e.getY();
