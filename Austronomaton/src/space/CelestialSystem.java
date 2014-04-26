@@ -1,10 +1,7 @@
 package space;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
 
 import utils.MathUtils;
@@ -14,9 +11,6 @@ public abstract class CelestialSystem {
 	private List<CelestialBody> stars = new ArrayList<>();
 	private List<CelestialBody> planetLike = new ArrayList<>();
 	private List<SpaceDust> spaceDust = new ArrayList<>();
-
-	BufferedImage image;
-	Graphics2D g;
 
 	public CelestialSystem() {
 	}
@@ -159,22 +153,16 @@ public abstract class CelestialSystem {
 		return dust;
 	}
 
-	public BufferedImage getImage(int width, int height, int offsetX, int offsetY) {
-		if (image == null || image.getWidth() != width || image.getHeight() != height) {
-			image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-			g = image.createGraphics();
-		}
-
+	public void drawOn(Graphics2D g, int width, int height, int offsetX, int offsetY) {
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width, height);
 
-		for (SpaceDust dust : new ArrayList<>(spaceDust)) {
+		for (SpaceDust dust : spaceDust) {
 			dust.drawOn(g, offsetX, offsetY);
 		}
-		for (CelestialBody cb : new ArrayList<>(celestialBodies)) {
+
+		for (CelestialBody cb : celestialBodies) {
 			cb.drawOn(g, offsetX, offsetY);
 		}
-
-		return image;
 	}
 }
