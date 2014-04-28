@@ -88,12 +88,23 @@ public class Austronomaton {
 
 			// draw the menu on top of the current system
 			if (isPaused) {
-				spaceMenu.drawOn(graphics, width, height);
+				spaceMenu.drawOn(graphics);
 			}
 
 			spacePanel.draw(image, width, height);
 
 			lastTime = currentTime;
+		}
+	}
+
+	void handleMouseReleased() {
+		// only called if the game is paused
+		String selection = spaceMenu.getSelection(mouseX, mouseY);
+		if (selection == null) {
+			return;
+		} else if (selection == SpaceMenu.START) {
+			currentSystem = new RandomSystem();
+			isPaused = false;
 		}
 	}
 

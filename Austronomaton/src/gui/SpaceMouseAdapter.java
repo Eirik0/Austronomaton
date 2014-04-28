@@ -79,13 +79,17 @@ public class SpaceMouseAdapter extends MouseAdapter {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if (!astro.isPaused) {
+		if (astro.isPaused) {
+			astro.handleMouseReleased();
+		} else {
 			stopDragging();
 		}
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
+		astro.setMouseXY(e.getX(), e.getY());
+
 		if (!astro.isPaused) {
 			isDragging = true;
 
