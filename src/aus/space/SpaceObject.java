@@ -1,19 +1,19 @@
-package space;
+package aus.space;
 
 import java.awt.Graphics2D;
 
 public interface SpaceObject {
-	public double getX();
+    double getX();
 
-	public double getY();
+    double getY();
 
-	public double getVelX();
+    double getVelX();
 
-	public double getVelY();
+    double getVelY();
 
-	public double getMass();
-	
-	public void drawOn(Graphics2D g, int offsetX, int offsetY);
+    double getMass();
 
-	public void passTime(double dt);
+    void drawOn(Graphics2D g, int offsetX, int offsetY);
+
+    void passTime(double dt);
 }
