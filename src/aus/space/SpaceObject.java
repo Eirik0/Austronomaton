@@ -1,8 +1,8 @@
 package aus.space;
 
-import java.awt.Graphics2D;
+import gt.gameentity.GameEntity;
 
-public interface SpaceObject {
+public interface SpaceObject extends GameEntity {
     double getX();
 
     double getY();
@@ -12,8 +12,4 @@ public interface SpaceObject {
     double getVelY();
 
     double getMass();
-
-    void drawOn(Graphics2D g, int offsetX, int offsetY);
-
-    void passTime(double dt);
 }

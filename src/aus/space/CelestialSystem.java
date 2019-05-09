@@ -5,42 +5,86 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import aus.utils.MathUtils;
+import gt.gameentity.CartesianSpace;
+import gt.gameentity.GameEntity;
 
-public abstract class CelestialSystem {
+public class CelestialSystem implements GameEntity {
+    private final CartesianSpace cs;
+
     private List<CelestialBody> celestialBodies = new ArrayList<>();
     private List<CelestialBody> stars = new ArrayList<>();
     private List<CelestialBody> planetLike = new ArrayList<>();
     private List<SpaceDust> spaceDust = new ArrayList<>();
 
-    public CelestialSystem() {
+    public CelestialSystem(CartesianSpace cs) {
+        this.cs = cs;
     }
 
-    protected void addStar(CelestialBody star) {
+    public void addStar(CelestialBody star) {
         stars.add(star);
         celestialBodies.add(star);
     }
 
-    protected void addPlanetLike(CelestialBody star) {
+    public void addPlanetLike(CelestialBody star) {
         planetLike.add(star);
         celestialBodies.add(star);
     }
 
-    public void passTime(double dt) {
+    public static CelestialSystem newRandomSystem(CartesianSpace cs) {
+        Random random = new Random();
+
+        CelestialSystem system = new CelestialSystem(cs);
+
+        CelestialBody sun = new CelestialBody(cs, 1000, 500, 18000, 25, Color.BLACK);
+        system.addStar(sun);
+
+        int numOfPlanets = 100;
+        for (int x = 0; x < numOfPlanets; ++x) {
+            int mass = random.nextInt(200) + 300;
+            int xPos = random.nextInt(2000);
+            int yPos = random.nextInt(1000);
+            Color planetColor = new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255));
+            CelestialBody planet = new CelestialBody(cs, xPos, yPos, mass, mass / 30, planetColor);
+            int vx = random.nextInt(4) + 4;
+            int vy = -random.nextInt(8) + 8;
+            if (xPos > 1000) {
+                vy *= -1;
+            }
+            if (yPos > 500) {
+                vx *= -1;
+            }
+            planet.setVelocity(vx, vy);
+            system.addPlanetLike(planet);
+
+            // add moon
+            if (random.nextInt(3) == 2) {
+                Color moonColor = new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255));
+                CelestialBody moon = new CelestialBody(cs, xPos + mass / 30, yPos - mass / 30, mass / 10, mass / 50, moonColor);
+                moon.setVelocity(vx, vy);
+                system.addPlanetLike(moon);
+            }
+        }
+        return system;
+    }
+
+    @Override
+    public void update(double dt) {
         celestialBodies.parallelStream().forEach(cb -> cb.applyForceOfGravity(celestialBodies, dt));
 
-        celestialBodies.parallelStream().forEach(cb -> cb.passTime(dt));
+        celestialBodies.parallelStream().forEach(cb -> cb.update(dt));
 
         spaceDust.parallelStream().forEach(cb -> cb.applyForceOfGravity(celestialBodies, dt));
 
-        spaceDust.parallelStream().forEach(cb -> cb.passTime(dt));
+        spaceDust.parallelStream().forEach(cb -> cb.update(dt));
 
         handleCollisions(dt);
 
         Iterator<SpaceDust> dustIterator = spaceDust.iterator();
         while (dustIterator.hasNext()) {
-            if (dustIterator.next().shouldRemoveAfter(500)) {
+            if (dustIterator.next().shouldRemoveAfter(50000)) {
                 dustIterator.remove();
             }
         }
@@ -55,7 +99,7 @@ public abstract class CelestialSystem {
 
             for (CelestialBody cb : stars) {
                 if (dust.collidesWith(cb)) {
-                    newSpaceDust.add(makeStarDust(cb, dust, dt));
+                    newSpaceDust.add(makeStarDust(cs, cb, dust, dt));
                     cb.addMass(dust.getMass());
 
                     dustIterator.remove();
@@ -126,8 +170,8 @@ public abstract class CelestialSystem {
         double vel = Math.sqrt(cb2.velX * cb2.velX + cb2.velY * cb2.velY);
 
         // Create two dust tangent to the collision
-        spaceDust.add(createSpaceDust(dustX, dustY, massToTake / 2, -ny * vel, nx * vel, cb2.color));
-        spaceDust.add(createSpaceDust(dustX, dustY, massToTake / 2, ny * vel, -nx * vel, cb2.color));
+        spaceDust.add(createSpaceDust(cs, dustX, dustY, massToTake / 2, -ny * vel, nx * vel, cb2.color));
+        spaceDust.add(createSpaceDust(cs, dustX, dustY, massToTake / 2, ny * vel, -nx * vel, cb2.color));
 
         // TODO Make planets resist each other differently
         cb2.velX -= 0.75 * nx / cb2.mass;
@@ -136,7 +180,7 @@ public abstract class CelestialSystem {
         cb1.velY += 0.75 * ny / cb1.mass;
     }
 
-    private SpaceDust makeStarDust(CelestialBody star, CelestialBody cb2, double dt) {
+    private static SpaceDust makeStarDust(CartesianSpace cs, CelestialBody star, CelestialBody cb2, double dt) {
         // Fling space dust perpendicular to the star
         double distance = MathUtils.distance(star.x, star.y, cb2.x, cb2.y);
         double nx = (cb2.x - star.x) / distance;
@@ -145,26 +189,23 @@ public abstract class CelestialSystem {
         double dustX = cb2.x + nx * cb2.radius + nx;
         double dustY = cb2.y + ny * cb2.radius + ny;
 
-        return createSpaceDust(dustX, dustY, 1, nx * 500, ny * 500, Color.WHITE);
+        return createSpaceDust(cs, dustX, dustY, 1, nx * 500, ny * 500, Color.WHITE);
     }
 
-    private SpaceDust createSpaceDust(double x, double y, double mass, double vx, double vy, Color c) {
-        SpaceDust dust = new SpaceDust(x, y, mass, 1);
+    private static SpaceDust createSpaceDust(CartesianSpace cs, double x, double y, double mass, double vx, double vy, Color c) {
+        SpaceDust dust = new SpaceDust(cs, x, y, mass, 1, c);
         dust.setVelocity(vx, vy);
-        dust.setColor(c);
         return dust;
     }
 
-    public void drawOn(Graphics2D g, int width, int height, int offsetX, int offsetY) {
-        g.setColor(Color.BLACK);
-        g.fillRect(0, 0, width, height);
-
+    @Override
+    public void drawOn(Graphics2D graphics) {
         for (SpaceDust dust : spaceDust) {
-            dust.drawOn(g, offsetX, offsetY);
+            dust.drawOn(graphics);
         }
 
         for (CelestialBody cb : celestialBodies) {
-            cb.drawOn(g, offsetX, offsetY);
+            cb.drawOn(graphics);
         }
     }
 }

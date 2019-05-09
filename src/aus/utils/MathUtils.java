@@ -28,6 +28,7 @@ public class MathUtils {
         if (Double.isNaN(ret)) {
             return Math.PI * r2 * r2;
         }
+
         return ret;
     }
 

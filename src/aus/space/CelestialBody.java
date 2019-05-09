@@ -5,30 +5,32 @@ import java.awt.Graphics2D;
 import java.util.List;
 
 import aus.utils.MathUtils;
+import gt.gameentity.CartesianSpace;
 
 public class CelestialBody implements SpaceObject {
-    double x;
-    double y;
-    double velX = 0;
-    double velY = 0;
-    double mass;
-    double radius;
-    Color color = Color.BLACK;
+    protected final CartesianSpace cs;
 
-    public CelestialBody(double x0, double y0, double mass, double radius) {
+    protected double x;
+    protected double y;
+    protected double velX = 0;
+    protected double velY = 0;
+    protected double mass;
+    protected double radius;
+    protected final Color color;
+
+    public CelestialBody(CartesianSpace cs, double x0, double y0, double mass, double radius, Color color) {
+        this.cs = cs;
+
         x = x0;
         y = y0;
         this.mass = mass;
         this.radius = radius;
+        this.color = color;
     }
 
     public void setVelocity(double vx, double vy) {
         velX = vx;
         velY = vy;
-    }
-
-    public void setColor(Color c) {
-        color = c;
     }
 
     public double getRadius() {
@@ -79,10 +81,15 @@ public class CelestialBody implements SpaceObject {
     }
 
     @Override
-    public void drawOn(Graphics2D g, int offsetX, int offsetY) {
-        g.setColor(color);
-        g.fillOval(MathUtils.makeInt(x - radius) - offsetX, MathUtils.makeInt(y - radius) - offsetY, MathUtils.makeInt(2 * radius),
-                MathUtils.makeInt(2 * radius));
+    public void update(double dt) {
+        x += velX * dt;
+        y += velY * dt;
+    }
+
+    @Override
+    public void drawOn(Graphics2D graphics) {
+        graphics.setColor(color);
+        fillCircle(graphics, cs.getImageX(x), cs.getImageY(y), cs.getImageWidth(radius));
     }
 
     public void applyForceOfGravity(List<? extends SpaceObject> spaceObjects, double dt) {
@@ -109,11 +116,5 @@ public class CelestialBody implements SpaceObject {
 
         velX += (fX * dt) / mass;
         velY += (fY * dt) / mass;
-    }
-
-    @Override
-    public void passTime(double dt) {
-        x += velX * dt;
-        y += velY * dt;
     }
 }
