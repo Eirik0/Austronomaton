@@ -1,7 +1,6 @@
 package aus.space;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,14 +9,15 @@ import java.util.Random;
 import aus.utils.MathUtils;
 import gt.gameentity.CartesianSpace;
 import gt.gameentity.GameEntity;
+import gt.gameentity.IGraphics;
 
 public class CelestialSystem implements GameEntity {
     private final CartesianSpace cs;
 
-    private List<CelestialBody> celestialBodies = new ArrayList<>();
-    private List<CelestialBody> stars = new ArrayList<>();
-    private List<CelestialBody> planetLike = new ArrayList<>();
-    private List<SpaceDust> spaceDust = new ArrayList<>();
+    private final List<CelestialBody> celestialBodies = new ArrayList<>();
+    private final List<CelestialBody> stars = new ArrayList<>();
+    private final List<CelestialBody> planetLike = new ArrayList<>();
+    private final List<SpaceDust> spaceDust = new ArrayList<>();
 
     public CelestialSystem(CartesianSpace cs) {
         this.cs = cs;
@@ -199,13 +199,13 @@ public class CelestialSystem implements GameEntity {
     }
 
     @Override
-    public void drawOn(Graphics2D graphics) {
+    public void drawOn(IGraphics g) {
         for (SpaceDust dust : spaceDust) {
-            dust.drawOn(graphics);
+            dust.drawOn(g);
         }
 
         for (CelestialBody cb : celestialBodies) {
-            cb.drawOn(graphics);
+            cb.drawOn(g);
         }
     }
 }

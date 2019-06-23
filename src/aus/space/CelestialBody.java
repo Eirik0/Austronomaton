@@ -1,11 +1,11 @@
 package aus.space;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.util.List;
 
 import aus.utils.MathUtils;
 import gt.gameentity.CartesianSpace;
+import gt.gameentity.IGraphics;
 
 public class CelestialBody implements SpaceObject {
     protected final CartesianSpace cs;
@@ -87,9 +87,8 @@ public class CelestialBody implements SpaceObject {
     }
 
     @Override
-    public void drawOn(Graphics2D graphics) {
-        graphics.setColor(color);
-        fillCircle(graphics, cs.getImageX(x), cs.getImageY(y), cs.getImageWidth(radius));
+    public void drawOn(IGraphics g) {
+        g.fillCircle(cs.getImageX(x), cs.getImageY(y), cs.getImageWidth(radius), color);
     }
 
     public void applyForceOfGravity(List<? extends SpaceObject> spaceObjects, double dt) {

@@ -16,8 +16,8 @@ public class AustronomatonMain {
         GamePanel mainPanel = new GamePanel("Austronomaton");
         mainPanel.setPreferredSize(new Dimension(ComponentCreator.DEFAULT_WIDTH, ComponentCreator.DEFAULT_HEIGHT));
 
-        GameStateManager.setMainPanel(mainPanel);
-        GameStateManager.setGameState(new SpaceGameState(GameStateManager.getMouseTracker()));
+        GameStateManager gameStateManager = mainPanel.getGameStateManager();
+        gameStateManager.setGameState(new SpaceGameState(gameStateManager.getMouseTracker()));
 
         MainFrame mainFrame = new MainFrame(TITLE, mainPanel);
 

@@ -1,9 +1,9 @@
 package aus.space;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 
 import gt.gameentity.CartesianSpace;
+import gt.gameentity.IGraphics;
 
 public class SpaceDust extends CelestialBody {
     private long lifeSpan = 0;
@@ -21,11 +21,11 @@ public class SpaceDust extends CelestialBody {
     }
 
     @Override
-    public void drawOn(Graphics2D graphics) {
-        graphics.setColor(color);
+    public void drawOn(IGraphics g) {
+        g.setColor(color);
         double x1 = cs.getImageX(x);
         double y1 = cs.getImageY(y);
-        graphics.drawLine(round(x1), round(y1), round(cs.getImageX(x + velX / 150)), round(cs.getImageY(y + velY / 150)));
+        g.drawLine(x1, y1, cs.getImageX(x + velX / 150), cs.getImageY(y + velY / 150));
     }
 
     public boolean shouldRemoveAfter(long n) {

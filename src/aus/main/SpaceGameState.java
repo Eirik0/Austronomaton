@@ -1,11 +1,10 @@
 package aus.main;
 
-import java.awt.Graphics2D;
-
 import aus.space.CelestialSystem;
 import gt.component.ComponentCreator;
 import gt.component.MouseTracker;
 import gt.gameentity.CartesianSpace;
+import gt.gameentity.IGraphics;
 import gt.gameloop.TimeConstants;
 import gt.gamestate.GameState;
 import gt.gamestate.UserInput;
@@ -13,7 +12,7 @@ import gt.gamestate.UserInput;
 public class SpaceGameState implements GameState {
     private final CelestialSystem currentSystem;
 
-    private MouseTracker mouseTracker;
+    private final MouseTracker mouseTracker;
     private final CartesianSpace cs;
 
     private boolean leftButtonPressed = false;
@@ -36,11 +35,11 @@ public class SpaceGameState implements GameState {
     }
 
     @Override
-    public void drawOn(Graphics2D graphics) {
+    public void drawOn(IGraphics g) {
         // Background
-        fillRect(graphics, 0, 0, cs.getImageWidth(), cs.getImageHeight(), ComponentCreator.backgroundColor());
+        g.fillRect(0, 0, cs.getImageWidth(), cs.getImageHeight(), ComponentCreator.backgroundColor());
 
-        currentSystem.drawOn(graphics);
+        currentSystem.drawOn(g);
     }
 
     @Override
