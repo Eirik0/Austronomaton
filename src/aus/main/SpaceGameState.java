@@ -2,7 +2,7 @@ package aus.main;
 
 import aus.space.CelestialSystem;
 import gt.component.ComponentCreator;
-import gt.component.MouseTracker;
+import gt.component.IMouseTracker;
 import gt.gameentity.CartesianSpace;
 import gt.gameentity.IGraphics;
 import gt.gameloop.TimeConstants;
@@ -12,15 +12,14 @@ import gt.gamestate.UserInput;
 public class SpaceGameState implements GameState {
     private final CelestialSystem currentSystem;
 
-    private final MouseTracker mouseTracker;
+    private final IMouseTracker mouseTracker;
     private final CartesianSpace cs;
 
     private boolean leftButtonPressed = false;
     private int mouseX = 0;
     private int mouseY = 0;
-    private double mouseWheelRotation = 0;
 
-    public SpaceGameState(MouseTracker mouseTracker) {
+    public SpaceGameState(IMouseTracker mouseTracker) {
         this.mouseTracker = mouseTracker;
 
         int width = ComponentCreator.DEFAULT_WIDTH;
@@ -43,7 +42,7 @@ public class SpaceGameState implements GameState {
     }
 
     @Override
-    public void setSize(int width, int height) {
+    public void setSize(double width, double height) {
         cs.setSize(width, height);
     }
 
@@ -52,15 +51,13 @@ public class SpaceGameState implements GameState {
         switch (input) {
         case MOUSE_MOVED:
             if (leftButtonPressed) {
-                cs.move(mouseX - mouseTracker.mouseX, mouseY - mouseTracker.mouseY);
+                cs.move(mouseX - mouseTracker.mouseX(), mouseY - mouseTracker.mouseY());
             }
-            mouseX = mouseTracker.mouseX;
-            mouseY = mouseTracker.mouseY;
+            mouseX = mouseTracker.mouseX();
+            mouseY = mouseTracker.mouseY();
             break;
         case MOUSE_WHEEL_MOVED:
-            double wheelDelta = mouseWheelRotation - mouseTracker.wheelRotation;
-            cs.zoom(0.05 * wheelDelta, mouseX, mouseY);
-            mouseWheelRotation = mouseTracker.wheelRotation;
+            cs.zoom(-0.05 * mouseTracker.wheelRotationDelta(), mouseX, mouseY);
             break;
         case LEFT_BUTTON_PRESSED:
             leftButtonPressed = true;
